@@ -27,7 +27,7 @@
 pkgname=php7
 _pkgreal=php
 pkgver=7.3.17
-pkgrel=2
+pkgrel=3
 _apiver=20180731
 _suffix=${pkgname#php}
 # Is this package the default (latest) PHP version?
@@ -104,6 +104,7 @@ source="https://php.net/distributions/$_pkgreal-$pkgver.tar.xz
 	allow-build-recode-and-imap-together.patch
 	fix-tests-devserver.patch
 	enchant-2.patch
+	pdo_dblib-musl.patch
 	"
 builddir="$srcdir/$_pkgreal-$pkgver"
 
@@ -696,4 +697,5 @@ ebf571c5e595221b9944d7e840807ebb68c1be38bf117186e19a3bd1070310ece5918bcaa5f94167
 fc680157c9bfaa600a82da0b2b8b96c9515eda653479bc9a9424e96683ea7c983190af0e54dcaf34256646069924df55f3f2d9a97fb11e971463a60f6df0e90f  php7-fpm-version-suffix.patch
 a07f6f54a298be6f10caa0ce68cebdf1c7cd1404ddb6a0f2c3a77fb7af3c4172bc4474ffc784f3dc92514e4da2639e558aca6dc1cffcc2e55af0743eaad7de47  allow-build-recode-and-imap-together.patch
 695ce980ea659575ba26b8443051620e83dc806e04b3bbace791f14af5c581ae4329e2c6326b554c60dab1a13f6b7c3fde49f20032540e53f80ecfade88c5b94  fix-tests-devserver.patch
-b9b63a5fab6844cf98b7220948c94ea967b8bc9b6d76236e3b74e69f06513dd9e7c6684cda90f203adbb243c5bdfa5a51bd8dbab1bd0e266f0443480db9e31ed  enchant-2.patch"
+b9b63a5fab6844cf98b7220948c94ea967b8bc9b6d76236e3b74e69f06513dd9e7c6684cda90f203adbb243c5bdfa5a51bd8dbab1bd0e266f0443480db9e31ed  enchant-2.patch
+156c655f36f82ec506d7ef5bf69c0ced0af34a9f4b0fcc98a0af1046f67c06b3eb2bffbcbe3ebc1170a5dd20dd769426352fb7b98e1f6d87d7872fa9d6e5d1b8  pdo_dblib-musl.patch"
