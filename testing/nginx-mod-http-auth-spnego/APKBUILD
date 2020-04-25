@@ -1,0 +1,99 @@
+pkgname=nginx-mod-http-auth-spnego
+pkgver=1.1a
+pkgrel=0
+pkgdesc="SPNEGO for http authentication module for Nginx"
+url="https://github.com/stnoonan/spnego-http-auth-nginx-module"
+arch="all"
+license="BSD"
+_nginxver=1.16.1
+_modname=spnego-http-auth-nginx-module
+_modver=21bb963666480ca87e8051459bcd7cd35cc46df4
+depends="nginx~$_nginxver krb5"
+# Same as nginx package - dynamic modules deps + krb5-dev
+makedepends="
+	libmaxminddb-dev
+	libxml2-dev
+	linux-headers
+	luajit-dev
+	openssl-dev
+	paxmark
+	pcre-dev
+	pkgconf
+	zlib-dev
+	krb5-dev
+	"
+source="
+  https://nginx.org/download/nginx-$_nginxver.tar.gz
+  $_modname-${_modver:0:8}.tar.gz::https://github.com/stnoonan/$_modname/archive/$_modver.tar.gz
+  "
+_modules_dir="usr/lib/nginx/modules"
+
+build () {
+	cd "$srcdir/nginx-$_nginxver"
+
+	# Same as nginx package - dynamic modules + add-dynamic-module
+	export LUAJIT_LIB="$(pkgconf --variable=libdir luajit)"
+	export LUAJIT_INC="$(pkgconf --variable=includedir luajit)"
+	./configure \
+		--prefix=/var/lib/nginx \
+		--sbin-path=/usr/sbin/nginx \
+		--modules-path=/$_modules_dir \
+		--conf-path=/etc/nginx/nginx.conf \
+		--pid-path=/run/nginx/nginx.pid \
+		--lock-path=/run/nginx/nginx.lock \
+		--http-client-body-temp-path=/var/tmp/nginx/client_body \
+		--http-proxy-temp-path=/var/tmp/nginx/proxy \
+		--http-fastcgi-temp-path=/var/tmp/nginx/fastcgi \
+		--http-uwsgi-temp-path=/var/tmp/nginx/uwsgi \
+		--http-scgi-temp-path=/var/tmp/nginx/scgi \
+		--with-perl_modules_path=/usr/lib/perl5/vendor_perl \
+		\
+		--user=nginx \
+		--group=nginx \
+		--with-threads \
+		--with-file-aio \
+		\
+		--with-http_ssl_module \
+		--with-http_v2_module \
+		--with-http_realip_module \
+		--with-http_addition_module \
+		--with-http_sub_module \
+		--with-http_dav_module \
+		--with-http_flv_module \
+		--with-http_mp4_module \
+		--with-http_gunzip_module \
+		--with-http_gzip_static_module \
+		--with-http_auth_request_module \
+		--with-http_random_index_module \
+		--with-http_secure_link_module \
+		--with-http_degradation_module \
+		--with-http_slice_module \
+		--with-http_stub_status_module \
+		--with-mail_ssl_module \
+		--with-stream_ssl_module \
+		--with-stream_realip_module \
+		--with-stream_ssl_preread_module \
+		\
+		--add-dynamic-module=../$_modname-$_modver
+
+	make modules
+}
+
+package() {
+	local name="${pkgname#nginx-mod-}"
+	name="${name//-/_}"
+	local soname="ngx_${name}_module.so"
+
+	# TODO: don't include / OSI approved ?
+	install -Dm644 "$srcdir"/$_modname-$_modver/LICENSE \
+	               "$pkgdir"/usr/share/licenses/$pkgname/LICENSE
+
+	install -Dm755 "$srcdir"/nginx-$_nginxver/objs/$soname \
+	               "$pkgdir"/$_modules_dir/$soname
+
+	mkdir -p "$pkgdir"/etc/nginx/modules
+	echo "load_module \"modules/$soname\";" > \
+	               "$pkgdir"/etc/nginx/modules/$name.conf
+}
+sha512sums="17e95b43fa47d4fef5e652dea587518e16ab5ec562c9c94355c356440166d4b6a6a41ee520d406e5a34791a327d2e3c46b3f9b105ac9ce07afdd495c49eca437  nginx-1.16.1.tar.gz
+74b2d5ce63bbcf16fef33102406fe309820bbe805b502d7b6dfefaabe75d456c4fb0b56bc1d9c05d1fc39331c5a7b0a5298cfce4ecaaa4960666d67cc19ec3ce  spnego-http-auth-nginx-module-21bb9636.tar.gz"
