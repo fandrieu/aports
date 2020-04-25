@@ -1,0 +1,38 @@
+pkgname=php7-pdo_dblib
+_pkgreal=pdo_dblib
+pkgver=7.3.17
+pkgrel=3
+pkgdesc="PHP7 extension: DB-LIB (MS SQL, Sybase)"
+url="https://www.php.net/"
+arch="all"
+license="PHP-3.01 BSD LGPL-2.0-or-later MIT Zend-2.0"
+depends="php7-pdo"
+makedepends="freetds-dev php7-dev re2c"
+source="https://php.net/distributions/php-$pkgver.tar.bz2
+	musl.patch
+	"
+builddir="$srcdir/php-$pkgver/ext/$_pkgreal"
+options="!check"
+
+build() {
+	phpize7
+	./configure --prefix=/usr \
+		--with-php-config=/usr/bin/php-config7
+	make
+}
+
+check() {
+	#TODO...
+	make test
+}
+
+package() {
+	make INSTALL_ROOT="$pkgdir/" install
+
+	local confdir="$pkgdir/etc/php7/conf.d"
+	install -d $confdir
+	echo "extension=$_pkgreal.so" > $confdir/01_$_pkgreal.ini
+}
+
+sha512sums="0174805d7e8198830da40f421c77bd8f7380af1848318438fc0888fd4b3322ff47d508cdf0590ba1f8b84b21757f932899fb934fb6f87e7010073f88bb4822f2  php-7.3.17.tar.bz2
+0c83b70f183ef3a83927c6fbb865081e1ea5859ce81b6543d7f3dd97f9bb48081a08e0ff3b1a3ce6f8a83340c6323ba4d1f7f4af6c9a501f89728aaf0e12d544  musl.patch"
